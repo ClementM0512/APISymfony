@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% form_theme formVetement 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+<div class="form-group">
+    {% if editMode %}
+    <h1 class="center titre">Modification d'un vêtement</h1>
+	{% else %}
+	<h1 class="center titre">Création d'un vêtement</h1>
+	{% endif %}
+
+    {{ form_start(formVetement) }}
+
+    <div>
+		<div class="name">{{ form_row(formVetement.nom, {'attr' : {'placeholder' : "Nom du vêtement"}}) }}</div>
+		<div class="color">{{ form_row(formVetement.id_color, {'label':'Couleur'}) }}</div>
+	</div>
+    
+    <button type="submit" class="btn btn-success">
+		{% if editMode %}
+		Modifier le vêtement
+		{% else %}
+		Ajouter un vêtement
+		{% endif %}
+	</button>
+    {{ form_end(formVetement) }}
+</div>
+{% endblock %}

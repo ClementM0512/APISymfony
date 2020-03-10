@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello VetementController!{% endblock %}
+
+{% block body %}
+
+{% set newVetement = path('vetementNew', {'token':'1'}) %}
+
+    <div class="row">
+        <button onclick="window.location.pathname = '{{ newVetement }}'" type="button" class="btn-game btn btn-outline-danger">
+            Insertion vêtement
+        </button>
+    </div>
+{% endblock %}
