@@ -19,10 +19,20 @@ class VetementRepository extends ServiceEntityRepository
         parent::__construct($registry, Vetement::class);
     }
 
+    public function loadByAlphaOrder()
+    {
+        return $this->createQueryBuilder('u')
+        //->andWhere('u.exampleField = :val')
+        ->orderBy('u.nom', 'ASC')
+        ->getQuery()
+        ->getResult();
+    }
+    
     // /**
     //  * @return Vetement[] Returns an array of Vetement objects
     //  */
     /*
+
     public function findByExampleField($value)
     {
         return $this->createQueryBuilder('v')

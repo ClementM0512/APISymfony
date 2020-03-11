@@ -1,0 +1,17 @@
+{% extends "templateAPI/FrontPage.html.twig" %}
+
+{% block body %}
+
+	<div class ="block-center">
+    	<h1>Validation Page</h1>
+		<h3>
+			Êtes vous sur de supprimer
+				{{vetement.nom}} {{vetement.prenom}}
+			
+		</h3>
+
+		{{ form_start(action) }}
+		{{ form_end(action) }}
+
+	</div>
+{% endblock %}

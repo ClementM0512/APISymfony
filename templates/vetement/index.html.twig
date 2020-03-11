@@ -1,14 +1,27 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello VetementController!{% endblock %}
+{% extends "templateAPI/FrontPage.html.twig" %}
 
 {% block body %}
 
-{% set newVetement = path('vetementNew', {'token':'1'}) %}
-
+    {% block titre %}
+    <h1 class="text-center">Vêtements</h1>
+    {% endblock %}
+    {% set vetNew = path('vetNew', {'token':'1'}) %}
     <div class="row">
-        <button onclick="window.location.pathname = '{{ newVetement }}'" type="button" class="btn-game btn btn-outline-danger">
+        <button onclick="window.location.pathname = '{{ vetNew }}'" type="button" class="block-center btn-game btn btn-outline-success">
             Insertion vêtement
         </button>
     </div>
+
+    {% block content %}
+	<div class="liste">
+
+        {% for vetement in vetements %}
+		{% set vetShow = path('vetShow', {'vetId': vetement.id,'token': '1'}) %}
+			<button onclick="window.location.pathname = '{{ vetShow }}'" type="button" class="btn btn-outline-info btn-vet block-center">
+				{{ vetement.nom}}
+			</button>
+	    {% endfor %}
+	</div>
+
+    {% endblock %}
 {% endblock %}

@@ -1,12 +1,11 @@
-{% extends 'base.html.twig' %}
-{% form_theme formVetement 'bootstrap_4_layout.html.twig' %}
+{% extends "templateAPI/FrontPage.html.twig" %}
 
 {% block body %}
 <div class="form-group">
     {% if editMode %}
-    <h1 class="center titre">Modification d'un vêtement</h1>
+    <h1 class="text-center">Modification d'un vêtement</h1>
 	{% else %}
-	<h1 class="center titre">Création d'un vêtement</h1>
+	<h1 class="text-center">Création d'un vêtement</h1>
 	{% endif %}
 
     {{ form_start(formVetement) }}
