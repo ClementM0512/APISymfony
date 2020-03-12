@@ -77,8 +77,8 @@ class VetementController extends AbstractController
     /**
      * @Route("/{token}/vetement/{vetId}/{vetColorId}", name="vetDel")
      */
-    public function vetementDelete(Vetement $vetement, Request $request, EntityManagerInterface $manager, $vetId, $vetColorId){
-
+    public function vetementDelete(Request $request, EntityManagerInterface $manager, Vetement $vetId, $vetColorId){
+        $vetement = $vetId;
         $form = $this->createFormBuilder()
         ->add('Delete', SubmitType::class, ['label' => 'OUI, supprimer ce vêtement', 'attr' => ['class' => 'btn btn-danger btn-confirm']])
         ->add('NoDelete', SubmitType::class, ['label' => 'Retour', 'attr' => ['class' => 'btn btn-primary btn-confirm']])
@@ -86,20 +86,19 @@ class VetementController extends AbstractController
         
         $form->handleRequest($request);
 
+        $colorRepo = $this->getDoctrine()->getRepository(Couleur::class);
+        $color = $colorRepo->find($vetColorId);
+
         if (($form->getClickedButton() && 'Delete' === $form->getClickedButton()->getName()))
         {
             $vetRepo = $this->getDoctrine()->getRepository(Vetement::class);
-            $colorRepo = $this->getDoctrine()->getRepository(Couleur::class);
 
-            $color = $colorRepo->find($vetColorId);
-            $vetement = $vetRepo->findBy(
-                ['Vetement' => $Vetement->getId()],
-                ['colorName' => $color->getColorName()]
+            $vetement = $vetRepo->findOneBy(
+                ['id' => $vetement->getId(), 'id_color' => $vetColorId]
             );
 
-            $manager->remove($vetement);        //Pour supprimer un article.
+            $manager->remove($vetement);        
             $manager->flush();
-            
             
             return $this->redirectToRoute('vetHome',['token' => 1]);
         }
@@ -107,7 +106,11 @@ class VetementController extends AbstractController
         {
             return $this->redirectToRoute('vetHome',['token' => 1]);
         }
-        return $this->render('templateAPI/validation.html.twig', array('action' => $form->createView(), 'vetement' => $vetement));
+        return $this->render('templateAPI/validation.html.twig', array(
+            'action' => $form->createView(), 
+            'vetement' => $vetement,
+            'color'    => $color 
+        ));
         
     }
 }
