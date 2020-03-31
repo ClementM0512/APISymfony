@@ -6,9 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Doctrine\ORM\EntityManagerInterface; 
 use App\Repository\CouleurRepository;
 use App\Repository\VetementRepository;
+use App\Services\SecurityService;
 use App\Form\VetementType;
 use App\Entity\Vetement;
 use App\Entity\Couleur;
@@ -16,101 +18,60 @@ use App\Entity\Couleur;
 class VetementController extends AbstractController
 {
     /**
-     * @Route("/{token}/vetements", name="vetHome")
+     * @Route("/{token}/vetement/insert/{vetName}/{idColor}", name="InsertVetement")
      */
-    public function index(VetementRepository $vetRepo)
+    public function insert(
+        SecurityService $secu, 
+        ValidatorInterface $validator, 
+        EntityManagerInterface $entityManager, 
+        $token, $vetName, $idColor): Response
     {
-        $vetement = $vetRepo->loadByAlphaOrder();
+        // vérification de l'accès
+        $autorise = $secu->CheckToken($token);
 
-        return $this->render('vetement/index.html.twig', [
-            'vetements' => $vetement
-        ]);
+        if(!is_bool($autorise)) {
+            return $autorise;
+        }
+
+        #$entityManager = $this->getDoctrine()->getManager();
+        $vetement = new Vetement();
+        $vetement->setNom($vetName);
+        $vetement->setDescription("test");
+
+        if($idColor == 0) {
+            $idColor = random_int(1, 4);
+        }
+        // Récupération du dépôt de requete de Couleur
+        $repCouleur = $this->getDoctrine()->getRepository(Couleur::Class);
+        $couleur = $repCouleur->find($idColor);
+        
+        // Affectation à Vetement
+        $vetement->setIdColor($couleur);
+
+        $entityManager->persist($vetement);
+        $entityManager->flush();
+
+        // Encodage du vetement en json
+        $response = new Response();
+        $response->setContent(json_encode([
+            'operation' => 'insert',
+            'result' => true,
+            'type_objet' => 'vetement',
+            'id_objet' => $vetement->getId(),
+        ]));
+
+        $response->headers->set('Content-Type', 'application/json');
+        # voir aussi use Symfony\Component\HttpFoundation\JsonResponse;
+
+        return $response;
     }
 
-    /**
-     * @Route("/{token}/vetement/show/{vetId}", name="vetShow")
-     */
-    public function patientShow($vetId)
+    private function validationObjet($validator, Vetement $vet)
     {
-        $vetRepo = $this->getDoctrine()->getRepository(Vetement::class);
-        $colorRepo = $this->getDoctrine()->getRepository(Couleur::class);
-        
-        $vetement = $vetRepo->find($vetId);
-
-        $color = $colorRepo->find($vetement->getIdColor());
-
-        return $this->render('vetement/vetShow.html.twig',[
-            'vetement' => $vetement,
-            'color'    => $color 
-        ]);
+        $errors = $validator->validate($vet);
+        if (count($errors) > 0) {
+            return new Response((string) $errors, 400);
+        }
     }
 
-    /**
-     * @Route("/{token}/vetement/edit/{vetId}/{color}", name="vetEdit")
-     * @Route("/{token}/vetement/new", name="vetNew")
-     */
-    public function VetementForm(Vetement $vetement = null, Request $request, EntityManagerInterface $manager, CouleurRepository $repoColor)
-    {
-        if (!$vetement)
-        {
-            $vetement = new Vetement();
-        }
-        
-        $form = $this->createForm(VetementType::class, $vetement); 
-        $form->handleRequest($request);             
-        // dd($form);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $vetement->setIdcolor($form->get('id_color')->getData());
-            $manager->persist($vetement);            
-            $manager->flush();                  
-            
-            return $this->redirectToRoute('vetHome',['token' => 1]);
-        }
-        
-        return $this->render('vetement/newvetement.html.twig', [
-            'formVetement' => $form->createView(),       
-            'editMode' => $vetement->getId() !== null   
-        ]);
-    }
-    
-    /**
-     * @Route("/{token}/vetement/{vetId}/{vetColorId}", name="vetDel")
-     */
-    public function vetementDelete(Request $request, EntityManagerInterface $manager, Vetement $vetId, $vetColorId){
-        $vetement = $vetId;
-        $form = $this->createFormBuilder()
-        ->add('Delete', SubmitType::class, ['label' => 'OUI, supprimer ce vêtement', 'attr' => ['class' => 'btn btn-danger btn-confirm']])
-        ->add('NoDelete', SubmitType::class, ['label' => 'Retour', 'attr' => ['class' => 'btn btn-primary btn-confirm']])
-        ->getForm();
-        
-        $form->handleRequest($request);
-
-        $colorRepo = $this->getDoctrine()->getRepository(Couleur::class);
-        $color = $colorRepo->find($vetColorId);
-
-        if (($form->getClickedButton() && 'Delete' === $form->getClickedButton()->getName()))
-        {
-            $vetRepo = $this->getDoctrine()->getRepository(Vetement::class);
-
-            $vetement = $vetRepo->findOneBy(
-                ['id' => $vetement->getId(), 'id_color' => $vetColorId]
-            );
-
-            $manager->remove($vetement);        
-            $manager->flush();
-            
-            return $this->redirectToRoute('vetHome',['token' => 1]);
-        }
-        if (($form->getClickedButton() && 'NoDelete' === $form->getClickedButton()->getName()))
-        {
-            return $this->redirectToRoute('vetHome',['token' => 1]);
-        }
-        return $this->render('templateAPI/validation.html.twig', array(
-            'action' => $form->createView(), 
-            'vetement' => $vetement,
-            'color'    => $color 
-        ));
-        
-    }
 }
