@@ -18,12 +18,9 @@ use App\Entity\Couleur;
 class VetementController extends AbstractController
 {
     /**
-     * @Route("/{token}/vetement/insert/{vetName}/{idColor}", name="InsertVetement")
+     * @Route("/{token}/vetement/insert/{vetName}/{idColor}", name="vetInsert")
      */
-    public function insert(
-        SecurityService $secu, 
-        ValidatorInterface $validator, 
-        EntityManagerInterface $entityManager, 
+    public function vetInsert(SecurityService $secu, ValidatorInterface $validator, EntityManagerInterface $entityManager,
         $token, $vetName, $idColor): Response
     {
         // vérification de l'accès
@@ -61,17 +58,16 @@ class VetementController extends AbstractController
         ]));
 
         $response->headers->set('Content-Type', 'application/json');
-        # voir aussi use Symfony\Component\HttpFoundation\JsonResponse;
 
         return $response;
     }
 
-    private function validationObjet($validator, Vetement $vet)
-    {
-        $errors = $validator->validate($vet);
-        if (count($errors) > 0) {
-            return new Response((string) $errors, 400);
-        }
-    }
+    // private function validationObjet($validator, Vetement $vet)
+    // {
+    //     $errors = $validator->validate($vet);
+    //     if (count($errors) > 0) {
+    //         return new Response((string) $errors, 400);
+    //     }
+    // }
 
 }

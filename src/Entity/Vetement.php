@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -26,6 +28,16 @@ class Vetement
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_color;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Coupable", mappedBy="vetements")
+     */
+    private $coupables;
+
+    public function __construct()
+    {
+        $this->coupables = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -52,6 +64,34 @@ class Vetement
     public function setIdColor(?Couleur $id_color): self
     {
         $this->id_color = $id_color;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Coupable[]
+     */
+    public function getCoupables(): Collection
+    {
+        return $this->coupables;
+    }
+
+    public function addCoupable(Coupable $coupable): self
+    {
+        if (!$this->coupables->contains($coupable)) {
+            $this->coupables[] = $coupable;
+            $coupable->addVetement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCoupable(Coupable $coupable): self
+    {
+        if ($this->coupables->contains($coupable)) {
+            $this->coupables->removeElement($coupable);
+            $coupable->removeVetement($this);
+        }
 
         return $this;
     }

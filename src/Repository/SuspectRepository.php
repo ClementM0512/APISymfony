@@ -19,6 +19,20 @@ class SuspectRepository extends ServiceEntityRepository
         parent::__construct($registry, Suspect::class);
     }
 
+    public function findByGenreAgeSup($genre, $age)
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.genre = :genre')
+            ->setParameter('genre', $genre)
+            ->andWhere('s.age > :age')
+            ->setParameter('age', $age)
+            ->orderBy('s.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+
     // /**
     //  * @return Suspect[] Returns an array of Suspect objects
     //  */

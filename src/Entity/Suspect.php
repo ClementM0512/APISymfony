@@ -36,6 +36,11 @@ class Suspect
      */
     private $genre;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Coupable", inversedBy="suspect")
+     */
+    private $coupable;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -91,5 +96,17 @@ class Suspect
 
     public function UnTruc(?integer $int){
         return ($int ++);
+    }
+
+    public function getCoupable(): ?Coupable
+    {
+        return $this->coupable;
+    }
+
+    public function setCoupable(?Coupable $coupable): self
+    {
+        $this->coupable = $coupable;
+
+        return $this;
     }
 }
