@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class SuspectController extends AbstractController
 {
     /**
-     * @Route("{token}/supects", name="supects")
+     * @Route("{token}/suspects", name="supects")
      */
     public function findAll(EntityManagerInterface $em, SecurityService $secu, JsonEncodeService $JSEncode,$token)
     {
@@ -24,9 +24,11 @@ class SuspectController extends AbstractController
        }
 
        $repSuspect = $this->getDoctrine()->getRepository(Suspect::Class);
-       $Suspects = $repSuspect->findAll(); 
+       //objet coupable a serialize avant suspect
+       $suspects = $repSuspect->findAll(); 
        
-       $res = $JSEncode->JsonResponse($Suspects);
+    //    dd($suspects);
+       $res = $JSEncode->JsonResponse($suspects);
 
        return $res;
     }
