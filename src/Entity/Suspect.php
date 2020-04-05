@@ -37,7 +37,7 @@ class Suspect
     private $genre;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Coupable", inversedBy="suspect")
+     * @ORM\OneToMany(targetEntity="App\Entity\Coupable", mappedBy="suspect")
      */
     private $coupable;
 
@@ -98,15 +98,4 @@ class Suspect
         return ($int ++);
     }
 
-    public function getCoupable(): ?Coupable
-    {
-        return $this->coupable;
-    }
-
-    public function setCoupable(?Coupable $coupable): self
-    {
-        $this->coupable = $coupable;
-
-        return $this;
-    }
 }

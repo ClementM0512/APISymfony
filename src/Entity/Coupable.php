@@ -19,7 +19,7 @@ class Coupable
     private $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Suspect", mappedBy="coupable")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Suspect", inversedBy="coupable")
      */
     private $suspect;
 
@@ -54,37 +54,18 @@ class Coupable
         return $this->id;
     }
 
-    /**
-     * @return Collection|Suspect[]
-     */
-    public function getSuspect(): Collection
+    public function geSuspect(): ?suspect
     {
         return $this->suspect;
     }
 
-    public function addSuspect(Suspect $suspect): self
+    public function setsuspect(?suspect $suspect): self
     {
-        if (!$this->suspect->contains($suspect)) {
-            $this->suspect[] = $suspect;
-            $suspect->setCoupable($this);
-        }
+        $this->suspect = $suspect;
 
         return $this;
     }
-
-    public function removeSuspect(Suspect $suspect): self
-    {
-        if ($this->suspect->contains($suspect)) {
-            $this->suspect->removeElement($suspect);
-            // set the owning side to null (unless already changed)
-            if ($suspect->getCoupable() === $this) {
-                $suspect->setCoupable(null);
-            }
-        }
-
-        return $this;
-    }
-
+    
     /**
      * @return Collection|Vetement[]
      */

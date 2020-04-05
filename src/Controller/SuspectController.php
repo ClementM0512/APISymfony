@@ -18,19 +18,20 @@ class SuspectController extends AbstractController
      */
     public function findAll(EntityManagerInterface $em, SecurityService $secu, JsonEncodeService $JSEncode,$token)
     {
-       $autorise = $secu->CheckToken($token);
-       if(!is_bool($autorise)) {
-           return $autorise;
-       }
 
-       $repSuspect = $this->getDoctrine()->getRepository(Suspect::Class);
-       //objet coupable a serialize avant suspect
-       $suspects = $repSuspect->findAll(); 
+        $autorise = $secu->CheckToken($token);
+        if(!is_bool($autorise)) {
+            return $autorise;
+        }
+
+        $repSuspect = $this->getDoctrine()->getRepository(Suspect::Class);
+        //objet coupable a serialize avant suspect
+        $suspects = $repSuspect->findAll(); 
        
-    //    dd($suspects);
-       $res = $JSEncode->JsonResponse($suspects);
+        $res = $JSEncode->JsonResponse($suspects);
 
-       return $res;
+        // dd($res);
+        return $res;
     }
 
     /**

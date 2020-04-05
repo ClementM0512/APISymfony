@@ -20,9 +20,10 @@ class CoupableController extends AbstractController
 {
     /**
      * @Route("/{token}/coupable/insert/{suspectId}/{sessionToken}/{prenom}", name="coupableInsert")
-     * @Route("/{token}/coupable/insert/{suspectId}", name="coupableInsertPost", methods={"POST"})
+     * @Route("/{token}/coupable/insert/{suspectId}", name="coupableInsertPost", methods={"GET"})
      */
-    public function coupableInsert(SecurityService $secu, EntityManagerInterface $em, $token, $suspectId, $sessionToken, $prenom)
+    public function coupableInsert(SecurityService $secu, EntityManagerInterface $em, 
+    $token, $suspectId, $sessionToken = 0, $prenom = 0)
     {
         $method = $_SERVER['REQUEST_METHOD'];
         // vérification de l'accès
@@ -30,10 +31,6 @@ class CoupableController extends AbstractController
 
         if(!is_bool($autorise)) {
             return $autorise;
-        }
-
-        if ($method = "POST") {
-
         }
 
         $repVet = $this->getDoctrine()->getRepository(Vetement::Class);
@@ -53,12 +50,20 @@ class CoupableController extends AbstractController
         $suspect = $repSuspect->find($suspectId);
 
         $coupable = new Coupable();
-        $coupable->setPrenom($prenom)
-            ->setSessionToken($sessionToken)
-            ->addVetement($vet1)
+
+        if ($method = "POST") {
+            $coupable->setPrenom($_POST["prenom"])
+            ->setSessionToken($_POST["sessionToken"]);
+        }
+        else {
+            $coupable->setPrenom($prenom)
+            ->setSessionToken($sessionToken);
+        }
+       
+            $coupable->addVetement($vet1)
             ->addVetement($vet2)
             ->setCouvreChef($couvreChef)
-            ->addSuspect($suspect)
+            ->setSuspect($suspect)
         ;    
 
         $em->persist($coupable);
