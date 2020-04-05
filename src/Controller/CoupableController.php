@@ -20,7 +20,7 @@ class CoupableController extends AbstractController
 {
     /**
      * @Route("/{token}/coupable/insert/{suspectId}/{sessionToken}/{prenom}", name="coupableInsert")
-     * @Route("/{token}/coupable/insert/{suspectId}", name="coupableInsertPost", methods={"GET"})
+     * @Route("/{token}/coupable/insert/{suspectId}", name="coupableInsertPost", methods={"POST"})
      */
     public function coupableInsert(SecurityService $secu, EntityManagerInterface $em, 
     $token, $suspectId, $sessionToken = 0, $prenom = 0)
